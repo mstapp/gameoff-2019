@@ -2,9 +2,7 @@ import ga from '../libs/ga';
 import plugins from '../libs/plugins';
 import * as _enemies from './enemies';
 import * as _player from './player';
-import * as _treasure from './treasure';
 import * as _healthBar from './healthBar';
-import * as _exit from './exit';
 
 const CANVAS_H = 512,
   CANVAS_W = 512;
@@ -20,8 +18,10 @@ let g = ga(
 
 // game state (global & avail to other files)
 let s = {
-  message: 0,
+  CANVAS_H,
+  CANVAS_W,
   end: end,
+  message: 0,
 };
 window.g = g;
 window.s = s;
@@ -30,9 +30,13 @@ window.s = s;
 g.start();
 
 //Declare your global variables (global to this game)
-let player, treasure, enemies, chimes, exit,
+let player,
+  enemies, chimes,
     healthBar,
     gameScene, gameOverScene;
+
+//DEAD vars
+let exit, treasure;
 
 function setup() {
   // Set the canvas border and background color
@@ -41,10 +45,8 @@ function setup() {
   chimes = g.sound('sounds/chimes.wav');
   gameScene = g.group();
 
-  exit = _exit.create(gameScene);
   player = _player.create(gameScene);
-  treasure = _treasure.create(gameScene);
-  enemies = _enemies.create(3, gameScene);
+  enemies = _enemies.create(1, gameScene);
   healthBar = _healthBar.create(gameScene);
 
   // Add some text for the game over message
@@ -69,11 +71,9 @@ function play() {
   let {playerHit} = _enemies.moveAndCheckCollisions(enemies, player);
 
   _player.processPlayerHit(player, playerHit, healthBar);
-  _treasure.onPlayLoop(treasure, player, chimes);
 
   //Check for the end of the game
   _healthBar.checkGameLost(healthBar);
-  _exit.checkGameWon(treasure, exit);
 }
 
 // the "end" state
