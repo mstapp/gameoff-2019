@@ -1,8 +1,10 @@
 
 let g; // ga instance; dynamically bound to window.g below
+let s; // game state; dynamically bound to window.s below
 
 const ensureGlobals = () => {
     g = window.g;
+    s = window.s;
 }
 
 
@@ -13,7 +15,7 @@ let //numberOfEnemies = 3,
   speed = 1,
   direction = 1;
 
-export function createEnemies(numEnemies, scene) {
+export function create(numEnemies, scene) {
   ensureGlobals();
   let enemies = [];
   for (let i = 0; i < numEnemies; i++) {
@@ -65,3 +67,43 @@ export function createEnemies(numEnemies, scene) {
   return enemies;
 }
 
+export function moveAndCheckCollisions(enemies, player) {
+  let playerHit = false;
+
+  //Loop through all the sprites in the `enemies` array
+  let loopCount = 0;
+  enemies.forEach(function(enemy, inx) {
+    loopCount++;
+    const field = enemy.field;
+    //Move the enemy (its child field will follow)
+    g.move(enemy);
+
+    //Check the enemy's screen boundaries
+    let enemyHitsEdges = g.contain(enemy, g.stage.localBounds),
+      fieldBounds = {x: field.gx, y: field.gy, width: field.width, height: field.height},
+      fieldHitsEdges = g.outsideBounds(fieldBounds, g.stage.localBounds);
+
+    // if (inx === 0 && loopCount % 100 === 1) {
+    //   console.log(`fieldBounds = `, fieldBounds)
+    //   console.log(`g.stage.localBounds = `, g.stage.localBounds)
+    //   if (fieldHitsEdges) {
+    //     console.log(`fieldHitsEdges = ${fieldHitsEdges}`)
+    //   }
+    // }
+
+    //If the enemy hits the top or bottom of the stage, reverse
+    //its direction
+    if (enemyHitsEdges === "top" || enemyHitsEdges === "bottom"
+        || fieldHitsEdges === "top" || fieldHitsEdges === "bottom") {
+      enemy.vy *= -1;
+      enemy.field.vy *= -1;
+    }
+
+    // for field hittest, "true" = use global coords
+    if (g.hitTestRectangle(player, enemy) || g.hitTestRectangle(player, enemy.field, true)) {
+      playerHit = true;
+    }
+  });
+
+  return {playerHit};
+}
