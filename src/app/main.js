@@ -3,6 +3,7 @@ import plugins from '../libs/plugins';
 import * as _enemies from './enemies';
 import * as _player from './player';
 import * as _healthBar from './healthBar';
+import * as utils from './utils';
 
 const CANVAS_H = 512,
   CANVAS_W = 512;
@@ -18,10 +19,14 @@ let g = ga(
 
 // game state (global & avail to other files)
 let s = {
+  BLOCK_H: 0,
+  BLOCK_W: 0,
   CANVAS_H,
   CANVAS_W,
-  end: end,
+  end,
+  maxSlotYPositions: [], // init'd by enemies.js
   message: 0,
+  NUM_BLOCK_SLOTS: 0, // set by enemies.js
 };
 window.g = g;
 window.s = s;
@@ -31,9 +36,10 @@ g.start();
 
 //Declare your global variables (global to this game)
 let player,
-  enemies, chimes,
-    healthBar,
-    gameScene, gameOverScene;
+  enemies = [], stoppedEnemies = [],
+  chimes,
+  healthBar,
+  gameScene, gameOverScene;
 
 //DEAD vars
 let exit, treasure;
@@ -45,8 +51,10 @@ function setup() {
   chimes = g.sound('sounds/chimes.wav');
   gameScene = g.group();
 
+  utils.init();
   player = _player.create(gameScene);
-  enemies = _enemies.create(1, gameScene);
+  _enemies.init();
+  // enemies = _enemies.create(1, gameScene);
   healthBar = _healthBar.create(gameScene);
 
   // Add some text for the game over message
@@ -59,7 +67,7 @@ function setup() {
   gameOverScene = g.group(s.message);
   gameOverScene.visible = false;
 
-  g.fourKeyController(player, 5, 38, 39, 40, 37);
+  // g.fourKeyController(player, 5, 38, 39, 40, 37);
 
   //start game: set the game state to "play"
   g.state = play;
@@ -67,10 +75,12 @@ function setup() {
 
 // The "play" state / game loop
 function play() {
-  _player.movePlayer(player);
-  let {playerHit} = _enemies.moveAndCheckCollisions(enemies, player);
+  _player.movePlayer(player, stoppedEnemies);
+  let {playerHit} = _enemies.moveAndCheckCollisions(enemies, stoppedEnemies, player);
+  _enemies.createNewIfNeeded(enemies, stoppedEnemies, gameScene);
 
   _player.processPlayerHit(player, playerHit, healthBar);
+  _enemies.checkIfReachedTop(stoppedEnemies, healthBar);
 
   //Check for the end of the game
   _healthBar.checkGameLost(healthBar);

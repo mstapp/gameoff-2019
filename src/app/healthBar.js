@@ -31,7 +31,7 @@ export function create(scene) {
 export function checkGameLost(healthBar) {
   //Does the player have enough health? If the width of the `innerBar`
   //is less than zero, end the game and display "You lost!"
-  if (healthBar.inner.width < 0) {
+  if (healthBar.inner.width <= 0) {
     g.state = s.end;
     s.message.content = "You lost!";
   }
