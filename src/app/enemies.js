@@ -1,19 +1,29 @@
+import * as utils from './utils';
 
 let g; // ga instance; dynamically bound to window.g below
 let s; // game state; dynamically bound to window.s below
 
-let NUM_BLOCK_SLOTS;
-const BLOCK_H = 32,
-  BLOCK_W = 32;
+let BLOCK_H,
+  BLOCK_W,
+  NUM_BLOCK_SLOTS,
+  NUM_COLS,
+  NUM_ROWS,
+  PLAYER_H,
+  PLAYER_W,
+  fixedBlocksMap;
 
 const ensureGlobals = () => {
     g = window.g;
     s = window.s;
 
-    s.BLOCK_H = BLOCK_H;
-    s.BLOCK_W = BLOCK_W;
-    NUM_BLOCK_SLOTS = Math.floor(s.CANVAS_W / BLOCK_W);
-    s.NUM_BLOCK_SLOTS = NUM_BLOCK_SLOTS;
+    BLOCK_H = s.BLOCK_H;
+    BLOCK_W = s.BLOCK_W;
+    NUM_BLOCK_SLOTS = s.NUM_BLOCK_SLOTS;
+    NUM_COLS = s.NUM_COLS;
+    NUM_ROWS = s.NUM_ROWS;
+    PLAYER_H = s.PLAYER_H;
+    PLAYER_W = s.PLAYER_W;
+    fixedBlocksMap = s.fixedBlocksMap;
     s.maxSlotYPositions.length = NUM_BLOCK_SLOTS;
     s.maxSlotYPositions.fill(s.CANVAS_H);
 }
@@ -32,11 +42,13 @@ export function init() {
   ensureGlobals();
 }
 
-function create(scene) {
+export function create(scene, slot) {
   //Each enemy is a red rectangle
   let enemy = g.rectangle(BLOCK_W, BLOCK_H, 'red');
   // start at random slot position
-  enemy.x = BLOCK_W * g.randomInt(0, NUM_BLOCK_SLOTS - 1);
+  if (slot === undefined)
+    slot = g.randomInt(0, NUM_BLOCK_SLOTS - 1);
+  enemy.x = BLOCK_W * slot;
   enemy.y = 0;
   enemy.vy = speed;
 
@@ -47,6 +59,8 @@ function create(scene) {
 }
 
 export function createNewIfNeeded(enemies, stoppedEnemies, scene) {
+  if (s.DEBUG_ENEMIES_OFF)
+    return;
   if (shouldCreateNew) {
     shouldCreateNew = false;
     const e = create(scene);
@@ -79,13 +93,17 @@ export function moveAndCheckCollisions(enemies, stoppedEnemies, player) {
       }
     });
 
-    // enemy hits bottom of stage? stop, add to stoppedEnemies
-    if (enemyHitsEdges === "bottom" || enemyHitsBlock) {
+    // enemy hits existing block or bottom of stage? stop, add to stoppedEnemies
+    if (enemyHitsBlock || enemyHitsEdges === "bottom") {
       enemy.vy = 0;
       indexesAddToStopped.push(inx);
+
+      // occupy block's position in fixedBlocksMap
+      const row = utils.gridRowCeil(enemy),
+        col = utils.gridColCeil(enemy);
+      fixedBlocksMap[row][col] = 1;
     }
 
-    // for field hittest, "true" = use global coords
     if (g.hitTestRectangle(player, enemy)) {
       playerHit = true;
     }
