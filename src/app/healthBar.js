@@ -19,6 +19,8 @@ export function create(scene) {
   //Set the `innerBar` as a property of the `healthBar`
   healthBar.inner = innerBar;
 
+  healthBar.score = 0;
+
   //Position the health bar
   healthBar.x = g.canvas.width - 148;
   healthBar.y = 16;

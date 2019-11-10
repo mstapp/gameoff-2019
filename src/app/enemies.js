@@ -5,7 +5,6 @@ let s; // game state; dynamically bound to window.s below
 
 let BLOCK_H,
   BLOCK_W,
-  NUM_BLOCK_SLOTS,
   NUM_COLS,
   NUM_ROWS,
   PLAYER_H,
@@ -18,13 +17,12 @@ const ensureGlobals = () => {
 
     BLOCK_H = s.BLOCK_H;
     BLOCK_W = s.BLOCK_W;
-    NUM_BLOCK_SLOTS = s.NUM_BLOCK_SLOTS;
     NUM_COLS = s.NUM_COLS;
     NUM_ROWS = s.NUM_ROWS;
     PLAYER_H = s.PLAYER_H;
     PLAYER_W = s.PLAYER_W;
     fixedBlocksMap = s.fixedBlocksMap;
-    s.maxSlotYPositions.length = NUM_BLOCK_SLOTS;
+    s.maxSlotYPositions.length = NUM_COLS;
     s.maxSlotYPositions.fill(s.CANVAS_H);
 }
 
@@ -47,7 +45,7 @@ export function create(scene, slot) {
   let enemy = g.rectangle(BLOCK_W, BLOCK_H, 'red');
   // start at random slot position
   if (slot === undefined)
-    slot = g.randomInt(0, NUM_BLOCK_SLOTS - 1);
+    slot = g.randomInt(0, NUM_COLS - 1);
   enemy.x = BLOCK_W * slot;
   enemy.y = 0;
   enemy.vy = speed;
@@ -104,9 +102,10 @@ export function moveAndCheckCollisions(enemies, stoppedEnemies, player) {
       fixedBlocksMap[row][col] = 1;
     }
 
-    if (g.hitTestRectangle(player, enemy)) {
-      playerHit = true;
-    }
+    // dupe?
+    // if (g.hitTestRectangle(player, enemy)) {
+    //   playerHit = true;
+    // }
   });
 
   indexesAddToStopped.forEach(inx => {

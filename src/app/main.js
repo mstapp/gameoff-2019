@@ -2,6 +2,7 @@ import ga from '../libs/ga';
 import plugins from '../libs/plugins';
 import * as _enemies from './enemies';
 import * as _player from './player';
+import * as _treasure from './treasure';
 import * as _healthBar from './healthBar';
 import * as utils from './utils';
 
@@ -13,7 +14,9 @@ const CANVAS_H = 512,
   PLAYER_W = 32,
   BLOCK_H = 32,
   BLOCK_W = 32,
-  NUM_BLOCK_SLOTS = Math.floor(CANVAS_W / BLOCK_W), // deprecated
+  TREASURE_H = 16,
+  TREASURE_W = 16,
+  TREASURE_BLOCK_OFFSET = (BLOCK_W - TREASURE_W) / 2,
   NUM_ROWS = Math.floor(CANVAS_H / BLOCK_H), // 16
   NUM_COLS = Math.floor(CANVAS_W / BLOCK_W), // 16
   fixedBlocksMap = Array(NUM_ROWS);  // will be 2d array: [NUM_ROWS][NUM_COLS]
@@ -42,13 +45,17 @@ let s = {
   DEBUG_ENEMIES_OFF,
   end,
   fixedBlocksMap,
+  healthBar: undefined,
+  level: 0,
   maxSlotYPositions: [], // init'd by enemies.js
   message: 0,
-  NUM_BLOCK_SLOTS,
   NUM_COLS,
   NUM_ROWS,
   PLAYER_H,
   PLAYER_W,
+  TREASURE_BLOCK_OFFSET,
+  TREASURE_H,
+  TREASURE_W,
 };
 window.g = g;
 window.s = s;
@@ -59,12 +66,13 @@ g.start();
 //Declare your global variables (global to this game)
 let player,
   enemies = [], stoppedEnemies = [],
+  treasures = [],
   chimes,
   healthBar,
   gameScene, gameOverScene;
 
 //DEAD vars
-let exit, treasure;
+let exit;
 
 function setup() {
   // Set the canvas border and background color
@@ -76,7 +84,13 @@ function setup() {
   utils.init();
   player = _player.create(gameScene);
   s.player = player;
+  healthBar = _healthBar.create(gameScene);
+  s.healthBar = healthBar;
+
+  _treasure.init();
   _enemies.init();
+  treasures.push(_treasure.create(gameScene, 12));
+
   if (DEBUG_ENEMIES_OFF) {
     enemies.push(_enemies.create(gameScene, 8));
     g.wait(130, () => enemies.push(_enemies.create(gameScene, 9)));
@@ -84,7 +98,6 @@ function setup() {
     g.wait(390, () => enemies.push(_enemies.create(gameScene, 7)));
     g.wait(520, () => enemies.push(_enemies.create(gameScene, 8)));
   }
-  healthBar = _healthBar.create(gameScene);
 
   // Add some text for the game over message
   s.message = g.text("Game Over!", "64px Futura", "black", 20, 20);
@@ -106,7 +119,10 @@ let tempCount = 0;
 function play() {
   _player.movePlayer(player, stoppedEnemies);
   let {playerHit} = _enemies.moveAndCheckCollisions(enemies, stoppedEnemies, player);
+  _treasure.checkCollisions(treasures, stoppedEnemies, player, gameScene);
+
   _enemies.createNewIfNeeded(enemies, stoppedEnemies, gameScene);
+  _treasure.createNewIfNeeded(treasures, gameScene);
 
   _player.processPlayerHit(player, playerHit, healthBar);
   _enemies.checkIfReachedTop(stoppedEnemies, healthBar);
