@@ -92,8 +92,13 @@ function createKeypressController(sprite, up, right, down, left) {
 }
 
 // in game loop
-export function movePlayer(player, stoppedBlocks) {
+export function movePlayer(player, stoppedBlocks, exit) {
   g.move(player);
+
+  if (g.hitTestRectangle(player, exit)) {
+    g.state = s.end;
+    s.message.content = "You won!";
+  }
 
   // at jumping apogee or falling? accelerate & check collision w/ stage & rocks
   if (!player.isGrounded && player.vy >= 0) {

@@ -45,12 +45,14 @@ let s = {
   DEBUG_ENEMIES_OFF,
   end,
   fixedBlocksMap,
+  end,
   healthBar: undefined,
   level: 0,
   maxSlotYPositions: [], // init'd by enemies.js
   message: 0,
   NUM_COLS,
   NUM_ROWS,
+  play,
   PLAYER_H,
   PLAYER_W,
   TREASURE_BLOCK_OFFSET,
@@ -67,12 +69,10 @@ g.start();
 let player,
   enemies = [], stoppedEnemies = [],
   treasures = [],
+  exit,
   chimes,
   healthBar,
   gameScene, gameOverScene;
-
-//DEAD vars
-let exit;
 
 function setup() {
   // Set the canvas border and background color
@@ -99,6 +99,12 @@ function setup() {
     g.wait(520, () => enemies.push(_enemies.create(gameScene, 8)));
   }
 
+  // The exit door
+  exit = g.rectangle(BLOCK_W, BLOCK_H, "green");
+  exit.x = CANVAS_W - BLOCK_W;
+  exit.y = CANVAS_H - BLOCK_H;
+  gameScene.addChild(exit);
+
   // Add some text for the game over message
   s.message = g.text("Game Over!", "64px Futura", "black", 20, 20);
   s.message.x = 120;
@@ -117,7 +123,7 @@ let tempCount = 0;
 
 // The "play" state / game loop
 function play() {
-  _player.movePlayer(player, stoppedEnemies);
+  _player.movePlayer(player, stoppedEnemies, exit);
   let {playerHit} = _enemies.moveAndCheckCollisions(enemies, stoppedEnemies, player);
   _treasure.checkCollisions(treasures, stoppedEnemies, player, gameScene);
 
