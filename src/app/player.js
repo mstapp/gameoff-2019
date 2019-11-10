@@ -24,7 +24,7 @@ const ensureGlobals = () => {
 }
 
 const upSpeed = 10,
-  gravity = 5,
+  gravity = 4,
   hSpeed = 4;
 
 export function create(scene) {
@@ -40,79 +40,6 @@ export function create(scene) {
   return player;
 }
 
-// function createKeypressController(sprite, up, right, down, left) {
-//   //Create a `direction` property on the sprite
-//   sprite.direction = "";
-
-//   //Create some keyboard objects
-//   var leftArrow = g.keyboard(left);
-//   var upKey = g.keyboard(up);
-//   var rightArrow = g.keyboard(right);
-//   var downArrow = g.keyboard(down);
-
-//   //Assign key `press` and release methods
-//   leftArrow.press = function() {
-//     sprite.vx = -hSpeed;
-//     // sprite.vy = 0;
-//     sprite.direction = "left";
-//   };
-//   leftArrow.release = function() {
-//     // if (!rightArrow.isDown && sprite.vy === 0) {
-//     if (!rightArrow.isDown) {
-//       sprite.vx = 0;
-//     }
-//   };
-//   rightArrow.press = function() {
-//     sprite.vx = hSpeed;
-//     // sprite.vy = 0;
-//     sprite.direction = "right";
-//   };
-//   rightArrow.release = function() {
-//     // if (!leftArrow.isDown && sprite.vy === 0) {
-//     if (!leftArrow.isDown) {
-//       sprite.vx = 0;
-//     }
-//   };
-//   upKey.press = function() {
-//     // if (sprite._jumping)
-//     //   return;
-//     // sprite._jumping = true;
-//     sprite.vy = -upSpeed;
-//     // sprite.vx = 0;
-//     sprite.direction = "up";
-//     sprite._jumping = true;
-//     // g.wait(200, () => {
-//     //   sprite._jumping = false;
-//     //   sprite.vy = 0;
-//     //   // new ypos = on top of the top block for this slot
-//     //   const mySlot = utils.myCurrentSlot(sprite);
-//     //   const blockTop = s.maxSlotYPositions[mySlot];
-//     //   sprite.y = blockTop - sprite.height;
-
-//     //   //TODO - get the leap-on-block mechanic done
-
-//     // });
-//   };
-//   upKey.release = function() {
-//     // if (!downArrow.isDown && sprite.vx === 0) {
-//     //   sprite.vy = 0;
-//     // }
-//     // sprite._jumping = false;
-//     // sprite.vy = -upSpeed;
-//     // sprite.direction = "down";
-//   };
-//   downArrow.press = function() {
-//     sprite.vy = gravity;
-//     // sprite.vx = 0;
-//     sprite.direction = "down";
-//   };
-//   downArrow.release = function() {
-//     if (!upKey.isDown && sprite.vx === 0) {
-//       sprite.vy = 0;
-//     }
-//   };
-// }
-
 function createKeypressController(sprite, up, right, down, left) {
   //Create a `direction` property on the sprite
   sprite.direction = "";
@@ -125,62 +52,36 @@ function createKeypressController(sprite, up, right, down, left) {
 
   leftArrow.press = function() {
     sprite.vx = -hSpeed;
-    // sprite.vy = 0;
     sprite.direction = "left";
   };
   leftArrow.release = function() {
-    // if (!rightArrow.isDown && sprite.vy === 0) {
-    // if (!rightArrow.isDown) {
-    //   sprite.vx = 0;
-    // }
     sprite.vx = 0;
   };
 
   rightArrow.press = function() {
     sprite.vx = hSpeed;
-    // sprite.vy = 0;
     sprite.direction = "right";
   };
   rightArrow.release = function() {
-    // if (!leftArrow.isDown && sprite.vy === 0) {
-    // if (!leftArrow.isDown) {
-    //   sprite.vx = 0;
-    // }
     sprite.vx = 0;
   };
 
   upKey.press = function() {
-    // if (sprite._jumping)
-    //   return;
-    // sprite._jumping = true;
     sprite.vy = -upSpeed;
-    // sprite.vx = 0;
     sprite.direction = "up";
     sprite.isGrounded = false;
-    // g.wait(200, () => {
-    //   sprite._jumping = false;
-    //   sprite.vy = 0;
-    //   // new ypos = on top of the top block for this slot
-    //   const mySlot = utils.myCurrentSlot(sprite);
-    //   const blockTop = s.maxSlotYPositions[mySlot];
-    //   sprite.y = blockTop - sprite.height;
-
-    //   //TODO - get the leap-on-block mechanic done
-
-    // });
   };
-  upKey.release = function() {
-    // if (!downArrow.isDown && sprite.vx === 0) {
-    //   sprite.vy = 0;
-    // }
-    // sprite._jumping = false;
-    // sprite.vy = -upSpeed;
-    // sprite.direction = "down";
-  };
+  // upKey.release = function() {
+  //   // if (!downArrow.isDown && sprite.vx === 0) {
+  //   //   sprite.vy = 0;
+  //   // }
+  //   // sprite._jumping = false;
+  //   // sprite.vy = -upSpeed;
+  //   // sprite.direction = "down";
+  // };
 
   downArrow.press = function() {
     sprite.vy = gravity;
-    // sprite.vx = 0;
     sprite.direction = "down";
   };
   downArrow.release = function() {
@@ -192,16 +93,11 @@ function createKeypressController(sprite, up, right, down, left) {
 
 // in game loop
 export function movePlayer(player, stoppedBlocks) {
-  //Move the player
   g.move(player);
 
   // at jumping apogee or falling? accelerate & check collision w/ stage & rocks
   if (!player.isGrounded && player.vy >= 0) {
     player.vy += 1;
-    // // new ypos = on top of the top block for this slot
-    // const mySlot = utils.myCurrentSlot(sprite);
-    // const blockTop = s.maxSlotYPositions[mySlot];
-    // sprite.y = blockTop - sprite.height;
   }
   // jumping (vy < 0)? gravity slows down
   if (player.vy < 0) {
@@ -218,14 +114,6 @@ export function movePlayer(player, stoppedBlocks) {
 
   // player hits side of stopped block?
   stoppedBlocks.forEach((block, inx) => {
-    // if (g.hitTestRectangle(player, block)) {
-    //   player.vx = 0; // stop moving
-    //   // reposition at edge of block
-    //   if (player.x < block.x) // left side of block
-    //     player.x = block.x - PLAYER_W;
-    //   else // right side
-    //     player.x = block.x + PLAYER_W;
-    // }
     const collision = g.rectangleCollision(player, block, false, true);
     if (collision === 'left' || collision === 'right') {
       console.log(`player collides-x with block - ${collision}`)
@@ -242,9 +130,6 @@ export function movePlayer(player, stoppedBlocks) {
   });
 
   // did just move off solid onto open space? start falling
-  // let {col, remainder} = utils.gridCol(player),
-  //   {row} = utils.gridRow(player);
-  // console.log(`player grid ${row},${col} .${remainder}`)
   if (player.isGrounded) {
     let {col, remainder} = utils.gridCol(player),
       row = utils.gridRowCeil(player);
@@ -259,12 +144,10 @@ export function movePlayer(player, stoppedBlocks) {
 
 // in game loop
 export function processPlayerHit(player, playerHit, healthBar) {
-  //If the player is hit...
   if (playerHit) {
-    //Make the player semi-transparent
-    player.alpha = 0.5;
-    //Reduce the width of the health bar's inner rectangle by 1 pixel
-    healthBar.inner.width -= 1;
+    player.alpha = 0.5; // semi-transparent
+    // player dies - no health left
+    healthBar.inner.width = 0;
   }
   else {
     //Make the player fully opaque (non-transparent) if it hasn't been hit

@@ -30,7 +30,7 @@ const ensureGlobals = () => {
 
 
 //Make the enemies
-let //numberOfEnemies = 3,
+let
   spacing = 48,
   xOffset = 150,
   speed = 5,

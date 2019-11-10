@@ -5,7 +5,7 @@ import * as _player from './player';
 import * as _healthBar from './healthBar';
 import * as utils from './utils';
 
-const DEBUG_ENEMIES_OFF = true;
+const DEBUG_ENEMIES_OFF = false;//true;
 
 const CANVAS_H = 512,
   CANVAS_W = 512,
@@ -95,8 +95,6 @@ function setup() {
   // (and make invisible for now)
   gameOverScene = g.group(s.message);
   gameOverScene.visible = false;
-
-  // g.fourKeyController(player, 5, 38, 39, 40, 37);
 
   //start game: set the game state to "play"
   g.state = play;
