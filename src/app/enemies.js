@@ -31,7 +31,7 @@ const ensureGlobals = () => {
 let
   spacing = 48,
   xOffset = 150,
-  speed = 5,
+  speed = 4,
   direction = 1;
 
 let shouldCreateNew = true;

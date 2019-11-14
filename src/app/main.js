@@ -13,7 +13,7 @@ const CANVAS_H = 512,
   PLAYER_H = 32,
   PLAYER_W = 32,
   BLOCK_H = 32,
-  BLOCK_W = 32,
+  BLOCK_W = 32*2,
   TREASURE_H = 16,
   TREASURE_W = 16,
   TREASURE_BLOCK_OFFSET = (BLOCK_W - TREASURE_W) / 2,
@@ -89,7 +89,7 @@ function setup() {
 
   _treasure.init();
   _enemies.init();
-  treasures.push(_treasure.create(gameScene, 12));
+  treasures.push(_treasure.create(gameScene, NUM_COLS - 3));
 
   if (DEBUG_ENEMIES_OFF) {
     enemies.push(_enemies.create(gameScene, 8));
@@ -102,7 +102,7 @@ function setup() {
   // The exit door
   exit = g.rectangle(BLOCK_W, BLOCK_H, "green");
   exit.x = CANVAS_W - BLOCK_W;
-  exit.y = CANVAS_H - BLOCK_H;
+  exit.y = CANVAS_H - (5*BLOCK_H);
   gameScene.addChild(exit);
 
   // Add some text for the game over message
@@ -139,8 +139,6 @@ function play() {
 
 // the "end" state
 function end() {
-  // hide the "gameScene" and display the "gameOverScene"
-  gameScene.visible = false;
-  gameOverScene.visible = true;
+  gameScene.addChild(s.message)
   g.pause();
 }
