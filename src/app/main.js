@@ -48,7 +48,8 @@ let s = {
   end,
   healthBar: undefined,
   level: 0,
-  maxSlotYPositions: [], // init'd by enemies.js
+  maxRowPerCol: [], // init'd by enemies.js
+  // maxColYPositions: [], // init'd by enemies.js
   message: 0,
   NUM_COLS,
   NUM_ROWS,

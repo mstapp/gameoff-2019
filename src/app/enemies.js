@@ -9,6 +9,7 @@ let BLOCK_H,
   NUM_ROWS,
   PLAYER_H,
   PLAYER_W,
+  maxRowPerCol,
   fixedBlocksMap;
 
 const ensureGlobals = () => {
@@ -22,10 +23,14 @@ const ensureGlobals = () => {
     PLAYER_H = s.PLAYER_H;
     PLAYER_W = s.PLAYER_W;
     fixedBlocksMap = s.fixedBlocksMap;
-    s.maxSlotYPositions.length = NUM_COLS;
-    s.maxSlotYPositions.fill(s.CANVAS_H);
+    // s.maxColYPositions.length = NUM_COLS;
+    // s.maxColYPositions.fill(s.CANVAS_H);
+    maxRowPerCol = s.maxRowPerCol;
+    maxRowPerCol.length = NUM_COLS;
+    maxRowPerCol.fill(NUM_ROWS);
 }
 
+const MAX_STACKED_BLOCK_DELTA = 3;
 
 //Make the enemies
 let
@@ -44,8 +49,13 @@ export function create(scene, col) {
   //Each enemy is a red rectangle
   let enemy = g.rectangle(BLOCK_W, BLOCK_H, 'red');
   // start at random col position
-  if (col === undefined)
-    col = g.randomInt(0, NUM_COLS - 1);
+  if (col === undefined) {
+    while (1) {
+      col = g.randomInt(0, NUM_COLS - 1);
+      if (colDeltaAllowed(col))
+        break;
+    }
+  }
   enemy.col = col; // for us
   enemy.x = BLOCK_W * col;
   enemy.y = 0;
@@ -55,6 +65,20 @@ export function create(scene, col) {
   scene.addChild(enemy);
 
   return enemy;
+}
+
+function colDeltaAllowed(col) {
+  let leftOK = true,
+    rightOK = true;
+  const newLevel = maxRowPerCol[col] - 1;
+  if (col > 0 && Math.abs(maxRowPerCol[col-1] - newLevel) > MAX_STACKED_BLOCK_DELTA)
+    leftOK = false;
+  if (col < NUM_COLS-1 && Math.abs(maxRowPerCol[col+1] - newLevel) > MAX_STACKED_BLOCK_DELTA)
+    rightOK = false;
+
+  if (leftOK && rightOK)
+    return true;
+  return false;
 }
 
 export function createNewIfNeeded(enemies, stoppedEnemies, scene) {
@@ -97,10 +121,12 @@ export function moveAndCheckCollisions(enemies, stoppedEnemies, player) {
       enemy.vy = 0;
       indexesAddToStopped.push(inx);
 
-      // occupy block's position in fixedBlocksMap
+      // occupy block's position in fixedBlocksMap & maxRowPerCol
       const row = utils.gridRowCeil(enemy),
         col = utils.gridColCeil(enemy);
       fixedBlocksMap[row][col] = 1;
+      maxRowPerCol[col] = row;
+      console.log(`enemy stopped: row,col ${row}, ${col}  max -1,0,+1 ${maxRowPerCol[col-1]},${maxRowPerCol[col]},${maxRowPerCol[col+1]}`)
     }
 
     // dupe?

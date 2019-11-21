@@ -12,7 +12,7 @@ export function init() {
 }
 
 // deprecated; use gridCol
-export function myCurrentSlot(sprite) {
+export function myCurrentCol(sprite) {
   return gridCol(sprite);
 }
 
