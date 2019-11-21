@@ -86,6 +86,7 @@ function setup() {
   s.player = player;
   healthBar = _healthBar.create(gameScene);
   s.healthBar = healthBar;
+  s.treasures = treasures;
 
   _treasure.init();
   _enemies.init();

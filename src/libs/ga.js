@@ -118,8 +118,8 @@ GA.custom = undefined;
 //game engine functions. However, Ga won't actually start until you
 //call the `start` method from the applicaiton code, as you can see in
 //all the examples (in the `examples` folder).
-GA.create = function(width, height, setup, assetsToLoad, load) {
-
+GA.create = function(width, height, setup, assetsToLoad, load, id) {
+  id = id || 'main-canvas';
   //The `ga` object is returned by this function. All the game
   //engine's methods and properties are going to be attached to it.
   var ga = {};
@@ -134,6 +134,7 @@ GA.create = function(width, height, setup, assetsToLoad, load) {
   ga.canvas = document.createElement("canvas");
   ga.canvas.setAttribute("width", width * dips);
   ga.canvas.setAttribute("height", height * dips);
+  ga.canvas.setAttribute("id", id);
   ga.canvas.style.backgroundColor = "black";
   document.body.appendChild(ga.canvas);
 

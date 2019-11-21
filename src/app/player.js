@@ -152,7 +152,7 @@ export function processPlayerHit(player, playerHit, healthBar) {
   if (playerHit) {
     player.alpha = 0.5; // semi-transparent
     // player dies - no health left
-    healthBar.inner.width = 0;
+    healthBar.alive = false;
   }
   else {
     //Make the player fully opaque (non-transparent) if it hasn't been hit

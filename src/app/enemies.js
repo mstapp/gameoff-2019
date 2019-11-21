@@ -40,13 +40,14 @@ export function init() {
   ensureGlobals();
 }
 
-export function create(scene, slot) {
+export function create(scene, col) {
   //Each enemy is a red rectangle
   let enemy = g.rectangle(BLOCK_W, BLOCK_H, 'red');
-  // start at random slot position
-  if (slot === undefined)
-    slot = g.randomInt(0, NUM_COLS - 1);
-  enemy.x = BLOCK_W * slot;
+  // start at random col position
+  if (col === undefined)
+    col = g.randomInt(0, NUM_COLS - 1);
+  enemy.col = col; // for us
+  enemy.x = BLOCK_W * col;
   enemy.y = 0;
   enemy.vy = speed;
 
@@ -119,6 +120,6 @@ export function moveAndCheckCollisions(enemies, stoppedEnemies, player) {
 
 export function checkIfReachedTop(stoppedEnemies, healthBar) {
   if (stoppedEnemies.some(block => block.y === 0)) {
-    healthBar.inner.width = 0;
+    healthBar.alive = false;
   }
 }

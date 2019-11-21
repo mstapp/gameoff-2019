@@ -12,7 +12,10 @@ let BLOCK_H,
   NUM_COLS,
   NUM_ROWS,
   fixedBlocksMap,
-  healthBar;
+  healthBar,
+  treasures;
+
+const numTreasuresThisLevel = 2;
 
 const ensureGlobals = () => {
     g = window.g;
@@ -28,6 +31,7 @@ const ensureGlobals = () => {
     NUM_ROWS = s.NUM_ROWS;
     fixedBlocksMap = s.fixedBlocksMap;
     healthBar = s.healthBar;
+    treasures = s.treasures;
 }
 
 
@@ -40,8 +44,14 @@ export function init() {
 export function create(scene, col) {
   // treasure = yellow rect
   let item = g.rectangle(TREASURE_W, TREASURE_H, 'yellow');
-  if (col === undefined)
-    col = g.randomInt(0, NUM_COLS - 1);
+  if (col === undefined) {
+    while (1) {
+      col = g.randomInt(0, NUM_COLS - 1);
+      if (!treasureAlreadyInCol(col))
+        break;
+    }
+  }
+  item.col = col; // for us
   item.x = (BLOCK_W * col) + TREASURE_BLOCK_OFFSET;
   // y-pos on top of highest block in this col
   let row;
@@ -58,11 +68,20 @@ export function create(scene, col) {
   return item;
 }
 
+function treasureAlreadyInCol(col) {
+  for (let i = 0; i < treasures.length; i++) {
+    if (treasures[i].col === col)
+      return true;
+  }
+}
+
 export function createNewIfNeeded(treasures, scene) {
   if (shouldCreateNew) {
     shouldCreateNew = false;
-    const it = create(scene);
-    treasures.push(it);
+    while (treasures.length < numTreasuresThisLevel) {
+      let it = create(scene);
+      treasures.push(it);
+    }
   }
 }
 
@@ -89,7 +108,7 @@ export function checkCollisions(treasures, stoppedEnemies, player, scene) {
   indexesPickedUp.forEach(inx => {
     if (playerHit) {
         console.log('Picked up treasure!')
-        healthBar.score += 100;
+        healthBar.addScore(100);
     }
     else {
         console.log('Treasure squashed!')
